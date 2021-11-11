@@ -1,0 +1,1 @@
+from home_assistant_plugin.factory import trigger
