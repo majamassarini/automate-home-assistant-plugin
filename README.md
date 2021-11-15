@@ -1,4 +1,4 @@
 # automate-home-assistant-plugin
 
-The **Home Assistant** plugin for the [automate-home project](https://maja-massarini-automate-home.readthedocs-hosted.com/en/latest/?).
+The **Home Assistant** plugin for the [automate-home project](https://github.com/majamassarini/automate-home).
 
