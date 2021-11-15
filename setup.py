@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name="home-assistant-plugin",
+setup(name="automate-home-assistant-plugin",
       version="0.9",
       description="A Home Assistant plugin for homino",
       long_description="",
