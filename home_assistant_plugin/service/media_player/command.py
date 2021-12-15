@@ -1,4 +1,3 @@
-import copy
 import home
 from home_assistant_plugin.message import Command as Parent
 
@@ -20,16 +19,20 @@ class Play(Parent):
         "type": "call_service",
         "domain": "media_player",
         "service": "media_play",
-        "service_data": {
-            "entity_id": "none"
-        }
+        "service_data": {"entity_id": "none"},
     }
 
-    def make_msgs_from(self,
-                       old_state: [home.appliance.attribute.mixin.IsOn,
-                                   home.appliance.attribute.mixin.IsOff],
-                       new_state: [home.appliance.attribute.mixin.IsOn,
-                                   home.appliance.attribute.mixin.IsOff]):
+    def make_msgs_from(
+        self,
+        old_state: [
+            home.appliance.attribute.mixin.IsOn,
+            home.appliance.attribute.mixin.IsOff,
+        ],
+        new_state: [
+            home.appliance.attribute.mixin.IsOn,
+            home.appliance.attribute.mixin.IsOff,
+        ],
+    ):
         result = []
         if (old_state.is_on != new_state.is_on) and new_state.is_on:
             result = self.execute()
@@ -53,16 +56,20 @@ class Pause(Parent):
         "type": "call_service",
         "domain": "media_player",
         "service": "media_pause",
-        "service_data": {
-            "entity_id": "none"
-        }
+        "service_data": {"entity_id": "none"},
     }
 
-    def make_msgs_from(self,
-                       old_state: [home.appliance.attribute.mixin.IsOn,
-                                   home.appliance.attribute.mixin.IsOff],
-                       new_state: [home.appliance.attribute.mixin.IsOn,
-                                   home.appliance.attribute.mixin.IsOff]):
+    def make_msgs_from(
+        self,
+        old_state: [
+            home.appliance.attribute.mixin.IsOn,
+            home.appliance.attribute.mixin.IsOff,
+        ],
+        new_state: [
+            home.appliance.attribute.mixin.IsOn,
+            home.appliance.attribute.mixin.IsOff,
+        ],
+    ):
         result = []
         if (old_state.is_on != new_state.is_on) and not new_state.is_on:
             result = self.execute()
@@ -90,13 +97,15 @@ class VolumeSet(Parent):
         "service": "volume_set",
         "service_data": {
             "entity_id": "none",
-            "volume_level": 0.1  # float between [0,1]
-        }
+            "volume_level": 0.1,  # float between [0,1]
+        },
     }
 
-    def make_msgs_from(self,
-                       old_state: home.appliance.attribute.mixin.Volume,
-                       new_state: home.appliance.attribute.mixin.Volume):
+    def make_msgs_from(
+        self,
+        old_state: home.appliance.attribute.mixin.Volume,
+        new_state: home.appliance.attribute.mixin.Volume,
+    ):
         self.message["service_data"]["volume_level"] = new_state.volume
         result = self.execute()
         return result
@@ -120,15 +129,12 @@ class ShuffleSet(Parent):
         "type": "call_service",
         "domain": "media_player",
         "service": "shuffle_set",
-        "service_data": {
-            "entity_id": "none",
-            "shuffle": True
-        }
+        "service_data": {"entity_id": "none", "shuffle": True},
     }
 
-    def make_msgs_from(self,
-                       old_state: home.appliance.State,
-                       new_state: home.appliance.State):
+    def make_msgs_from(
+        self, old_state: home.appliance.State, new_state: home.appliance.State
+    ):
         result = self.execute()
         return result
 
@@ -154,13 +160,15 @@ class SelectSource(Parent):
         "service": "select_source",
         "service_data": {
             "entity_id": "none",
-            "source": "none"  # a name in the sonos queue
-        }
+            "source": "none",  # a name in the sonos queue
+        },
     }
 
-    def make_msgs_from(self,
-                       old_state: home.appliance.attribute.mixin.Playlist,
-                       new_state: home.appliance.attribute.mixin.Playlist):
+    def make_msgs_from(
+        self,
+        old_state: home.appliance.attribute.mixin.Playlist,
+        new_state: home.appliance.attribute.mixin.Playlist,
+    ):
         self.message["service_data"]["source"] = new_state.playlist
         result = self.execute()
         return result

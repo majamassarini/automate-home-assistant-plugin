@@ -3,7 +3,6 @@ from home_assistant_plugin.service.trigger import Equals
 
 
 class Factory:
-
     def __init__(self, setup_triggers):
         self._setup_triggers = setup_triggers
 
@@ -35,11 +34,11 @@ class Playing(Equals):
                 "new_state": {
                     "entity_id": "none",
                     "state": "playing",
-                    "attributes": {}
-                }
+                    "attributes": {},
+                },
             },
-            "event_type": "state_changed"
-        }
+            "event_type": "state_changed",
+        },
     }
 
     DEFAULT_EVENTS = [home.appliance.sound.player.event.forced.Event.On]
@@ -52,15 +51,10 @@ class Paused(Equals):
         "event": {
             "data": {
                 "entity_id": "none",
-                "new_state": {
-                    "entity_id": "none",
-                    "state": "paused",
-                    "attributes": {}
-                }
+                "new_state": {"entity_id": "none", "state": "paused", "attributes": {}},
             },
-            "event_type": "state_changed"
-        }
+            "event_type": "state_changed",
+        },
     }
 
     DEFAULT_EVENTS = [home.appliance.sound.player.event.forced.Event.Off]
-

@@ -133,34 +133,43 @@ class Equals(Trigger):
 
     def __eq__(self, other):
         if super(Equals, self).__eq__(other):
-            if self.state == other.state and \
-                set([value for key, value in self.attributes.items()]) == \
-                    set([value for key, value in other.attributes.items() if key in self.attributes]):
+            if self.state == other.state and set(
+                [value for key, value in self.attributes.items()]
+            ) == set(
+                [
+                    value
+                    for key, value in other.attributes.items()
+                    if key in self.attributes
+                ]
+            ):
                 return True
         return False
 
     def __hash__(self):
-        return hash("{}{}{}".format(super(Equals, self).__hash__(),
-                    self.entity_id,
-                    self.state))
+        return hash(
+            "{}{}{}".format(super(Equals, self).__hash__(), self.entity_id, self.state)
+        )
 
     def __str__(self, *args, **kwargs):
-        s = "Triggered entity {} state {} with attributes [{}]".format(self.entity_id, self.state, self.attributes)
+        s = "Triggered entity {} state {} with attributes [{}]".format(
+            self.entity_id, self.state, self.attributes
+        )
         return s
 
     def is_triggered(self, another_description):
         if super(Equals, self).is_triggered(another_description):
             other = self.__class__(another_description.message)
-            if self.state == other.state and \
-                    set([key for key in self.attributes.keys()]) == \
-                    set([key for key in other.attributes.keys() if key in self.attributes]):
+            if self.state == other.state and set(
+                [key for key in self.attributes.keys()]
+            ) == set(
+                [key for key in other.attributes.keys() if key in self.attributes]
+            ):
                 self._logger.info("triggered {}".format(another_description))
                 return True
         return False
 
 
 class Comparison(Trigger):
-
     def __init__(self, message, events=None, value=None):
         message = self.override_value(message, value)
         super(Comparison, self).__init__(message, events)
@@ -172,9 +181,11 @@ class Comparison(Trigger):
         return False
 
     def __hash__(self):
-        return hash("{}{} comparison".format(super(Trigger, self).__hash__(),
-                                               self.entity_id,
-                                               self.state))
+        return hash(
+            "{}{}{} comparison".format(
+                super(Trigger, self).__hash__(), self.entity_id, self.state
+            )
+        )
 
     @staticmethod
     def override_value(message, value=None):
@@ -200,14 +211,14 @@ class Comparison(Trigger):
 
 
 class GreaterThan(Comparison):
-
     def is_triggered(self, another_description):
         if super(GreaterThan, self).is_triggered(another_description):
             triggered = self.state < another_description.state
-            self._logger.debug("{} triggered={} {} < {}".format(self,
-                                                                triggered,
-                                                                self.state,
-                                                                another_description.state))
+            self._logger.debug(
+                "{} triggered={} {} < {}".format(
+                    self, triggered, self.state, another_description.state
+                )
+            )
             return triggered
         return False
 
@@ -217,14 +228,14 @@ class GreaterThan(Comparison):
 
 
 class LesserThan(Comparison):
-
     def is_triggered(self, another_description):
         if super(LesserThan, self).is_triggered(another_description):
             triggered = self.state > another_description.state
-            self._logger.debug("{} triggered={} {} > {}".format(self,
-                                                                triggered,
-                                                                self.state,
-                                                                another_description.state))
+            self._logger.debug(
+                "{} triggered={} {} > {}".format(
+                    self, triggered, self.state, another_description.state
+                )
+            )
             return triggered
         return False
 
@@ -234,7 +245,6 @@ class LesserThan(Comparison):
 
 
 class InBetween(Comparison):
-
     def __init__(self, message, events=None, value=None, range=None):
         message = self.override_value(message, value)
         super(InBetween, self).__init__(message, events, value)
@@ -242,22 +252,21 @@ class InBetween(Comparison):
 
     def is_triggered(self, another_description):
         if super(InBetween, self).is_triggered(another_description):
-            triggered = self.state < another_description.state < (self.state + self._range)
-            self._logger.debug("{} triggered={} {} < {} < {}".format(self,
-                                                                     triggered,
-                                                                     self.state,
-                                                                     another_description.state,
-                                                                     (self.state + self._range)))
+            triggered = (
+                self.state < another_description.state < (self.state + self._range)
+            )
+            self._logger.debug(
+                "{} triggered={} {} < {} < {}".format(
+                    self,
+                    triggered,
+                    self.state,
+                    another_description.state,
+                    (self.state + self._range),
+                )
+            )
             return triggered
         return False
 
     def __str__(self):
         s = super(InBetween, self).__str__()
         return "{} in between [{}:{}]".format(s, self.state, (self.state + self._range))
-
-
-
-
-
-
-

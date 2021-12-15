@@ -5,7 +5,7 @@ import aiohttp
 import json
 
 import home
-from home_assistant_plugin.message import Description, Trigger, Command
+from home_assistant_plugin.message import Description, Command
 from home_assistant_plugin.service.notify.command import Command as Notifier
 from home_assistant_plugin import factory
 
@@ -49,28 +49,49 @@ class Gateway(home.protocol.Gateway):
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
                             self.logger.debug("received: {}".format(data))
-                            if data['type'] == 'auth_required':
+                            if data["type"] == "auth_required":
                                 # nel profilo di home assistant creare un token di lunga vita
-                                await self._websocket.send_str(json.dumps({"type": "auth",
-                                                                           "access_token": self._long_live_token}))
-                            elif data['type'] == 'auth_ok':
-                                await self._websocket.send_str(json.dumps({"id": 1, "type": "subscribe_events"}))
-                                await self._websocket.send_str(json.dumps({"id": 2, "type": "get_services"}))
-                                #await self._websocket.send_str(json.dumps({"id": 3, "type": "get_states"}))
-                                #await self._websocket.send_str(json.dumps({"id": 4, "type": "get_config"}))
-                            elif data['type'] == 'result':
-                                if data['success']:
+                                await self._websocket.send_str(
+                                    json.dumps(
+                                        {
+                                            "type": "auth",
+                                            "access_token": self._long_live_token,
+                                        }
+                                    )
+                                )
+                            elif data["type"] == "auth_ok":
+                                await self._websocket.send_str(
+                                    json.dumps({"id": 1, "type": "subscribe_events"})
+                                )
+                                await self._websocket.send_str(
+                                    json.dumps({"id": 2, "type": "get_services"})
+                                )
+                                # await self._websocket.send_str(json.dumps({"id": 3, "type": "get_states"}))
+                                # await self._websocket.send_str(json.dumps({"id": 4, "type": "get_config"}))
+                            elif data["type"] == "result":
+                                if data["success"]:
                                     continue
                                 else:
-                                    self.logger.error("received: {}".format(json.dumps(data, indent=4, sort_keys=True)))
+                                    self.logger.error(
+                                        "received: {}".format(
+                                            json.dumps(data, indent=4, sort_keys=True)
+                                        )
+                                    )
                             else:
                                 for task in wrapped_tasks:
                                     triggers = trigger_factory.get_triggers_from(data)
                                     for trigger in triggers:
-                                        if trigger and trigger.entity_id in self._triggers:
+                                        if (
+                                            trigger
+                                            and trigger.entity_id in self._triggers
+                                        ):
                                             self._loop.create_task(task(trigger))
                         elif msg.type == aiohttp.WSMsgType.ERROR:
-                            self.logger.error("received: {}".format(json.dumps(data, indent=4, sort_keys=True)))
+                            self.logger.error(
+                                "received: {}".format(
+                                    json.dumps(data, indent=4, sort_keys=True)
+                                )
+                            )
 
     async def disconnect(self):
         if self._session:
@@ -90,4 +111,3 @@ class Gateway(home.protocol.Gateway):
     @staticmethod
     def make_trigger(trigger):
         return trigger
-

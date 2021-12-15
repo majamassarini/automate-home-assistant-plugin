@@ -21,4 +21,3 @@ class Factory:
         for factory in self._factories:
             triggers.extend(factory.get_triggers_from(message))
         return triggers
-

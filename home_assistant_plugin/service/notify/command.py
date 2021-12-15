@@ -23,16 +23,12 @@ class Command(Description, home.protocol.Command):
     [Command: domain 'notify', service 'notify', message 'socket has been detached', title '', target [], other data {}]
     """
 
-    Message = {"type": "call_service",
-               "domain": "none",
-               "service": "none",
-               "service_data": {
-                   "message": "none",
-                   "title": "none",
-                   "target": [],
-                   "data": {}
-               }
-               }
+    Message = {
+        "type": "call_service",
+        "domain": "none",
+        "service": "none",
+        "service_data": {"message": "none", "title": "none", "target": [], "data": {}},
+    }
 
     def __init__(self, message):
         super(Command, self).__init__(message)
@@ -53,25 +49,33 @@ class Command(Description, home.protocol.Command):
             else:
                 self._data = {}
         else:
-            raise AttributeError("Given message ({}) is not a command message"
-                                 "it should be of type \"event\"".format(message))
+            raise AttributeError(
+                "Given message ({}) is not a command message"
+                'it should be of type "event"'.format(message)
+            )
 
     def __eq__(self, other):
         if super(Command, self).__eq__(other):
-            if self.notify_message == other.notify_message and \
-                    self.title == other.title and \
-                    self.domain == other.domain and \
-                    self.service == other.service:
+            if (
+                self.notify_message == other.notify_message
+                and self.title == other.title
+                and self.domain == other.domain
+                and self.service == other.service
+            ):
                 return True
         return False
 
     def __hash__(self):
-        return hash("{}{}{}{}{}".format(super(Command, self).__hash__(),
-                    self.domain,
-                    self.service,
-                    self.message,
-                    self.title))
-    
+        return hash(
+            "{}{}{}{}{}".format(
+                super(Command, self).__hash__(),
+                self.domain,
+                self.service,
+                self.message,
+                self.title,
+            )
+        )
+
     @property
     def domain(self):
         return self._domain
@@ -87,7 +91,7 @@ class Command(Description, home.protocol.Command):
     @property
     def title(self):
         return self._title
-    
+
     def execute(self):
         self._logger.info("execute {}".format(self.message))
         return [self]
@@ -96,7 +100,7 @@ class Command(Description, home.protocol.Command):
         return []
 
     @classmethod
-    def make(cls, message: str, title: str, target: list, data: dict) -> 'Command':
+    def make(cls, message: str, title: str, target: list, data: dict) -> "Command":
         msg = copy.deepcopy(cls.Message)
         msg["service_data"]["message"] = message
         msg["service_data"]["title"] = title
@@ -105,16 +109,20 @@ class Command(Description, home.protocol.Command):
         return cls(msg)
 
     @classmethod
-    def make_from_yaml(cls, message: str, title: str, target: list, data: dict) -> 'Command':
+    def make_from_yaml(
+        cls, message: str, title: str, target: list, data: dict
+    ) -> "Command":
         return cls.make(message, title, target, data)
 
     def __repr__(self, *args, **kwargs):
-        s = "Command: domain '{}', service '{}', message '{}', title '{}', target {}, other data {}".format(self.domain,
-                                                                                                            self.service,
-                                                                                                            self.notify_message,
-                                                                                                            self.title,
-                                                                                                            self._target,
-                                                                                                            self._data)
+        s = "Command: domain '{}', service '{}', message '{}', title '{}', target {}, other data {}".format(
+            self.domain,
+            self.service,
+            self.notify_message,
+            self.title,
+            self._target,
+            self._data,
+        )
         return s
 
 
@@ -134,14 +142,13 @@ class Detachable(Command):
         "type": "call_service",
         "domain": "notify",
         "service": "notify",
-        "service_data": {
-        }
+        "service_data": {},
     }
-    
+
     def make_msgs_from(self, old_state, new_state):
         result = []
-        if (old_state.is_detachable != new_state.is_detachable) and new_state.is_detachable:
+        if (
+            old_state.is_detachable != new_state.is_detachable
+        ) and new_state.is_detachable:
             result = self.execute()
         return result
-
-

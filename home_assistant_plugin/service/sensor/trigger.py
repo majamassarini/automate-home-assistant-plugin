@@ -2,7 +2,6 @@ from home_assistant_plugin.service.trigger import Equals
 
 
 class Factory:
-
     def __init__(self, setup_triggers):
         self._entity_id_klass = {}
         for trigger in setup_triggers:
@@ -27,14 +26,12 @@ class Factory:
 
 
 class IntMixin:
-
     @property
     def state(self):
         return int(self._state)
 
 
 class FloatMixin:
-
     @property
     def state(self):
         return float(self._state)
@@ -47,14 +44,10 @@ class On(Equals):
         "event": {
             "data": {
                 "entity_id": "none",
-                "new_state": {
-                    "entity_id": "none",
-                    "state": "on",
-                    "attributes": {}
-                }
+                "new_state": {"entity_id": "none", "state": "on", "attributes": {}},
             },
-            "event_type": "state_changed"
-        }
+            "event_type": "state_changed",
+        },
     }
 
 
@@ -65,13 +58,8 @@ class Off(Equals):
         "event": {
             "data": {
                 "entity_id": "none",
-                "new_state": {
-                    "entity_id": "none",
-                    "state": "off",
-                    "attributes": {}
-                }
+                "new_state": {"entity_id": "none", "state": "off", "attributes": {}},
             },
-            "event_type": "state_changed"
-        }
+            "event_type": "state_changed",
+        },
     }
-
