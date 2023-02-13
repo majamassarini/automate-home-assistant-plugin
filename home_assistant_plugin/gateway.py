@@ -92,6 +92,7 @@ class Gateway(home.protocol.Gateway):
                                     json.dumps(data, indent=4, sort_keys=True)
                                 )
                             )
+                asyncio.sleep(10)
 
     async def disconnect(self):
         if self._session:
