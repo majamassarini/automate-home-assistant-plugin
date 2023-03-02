@@ -38,7 +38,6 @@ class FloatMixin:
 
 
 class On(Equals):
-
     Message = {
         "type": "event",
         "event": {
@@ -52,7 +51,6 @@ class On(Equals):
 
 
 class Off(Equals):
-
     Message = {
         "type": "event",
         "event": {

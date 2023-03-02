@@ -169,6 +169,142 @@ class Equals(Trigger):
         return False
 
 
+class ChangedState(Trigger):
+    """
+    >>> from home_assistant_plugin.message import Description
+    >>> class Example(ChangedState):
+    ...     Message = {
+    ...         "type": "event",
+    ...         "event": {
+    ...         "event_type": "state_changed", 
+    ...             "data": {
+    ...                 "entity_id": "example_id",
+    ...                 "new_state": {"entity_id": "example_id", "state": "on"},
+    ...             }
+    ...         }
+    ...     }
+    >>> trigger = Example.make("example_id")
+    >>> import json
+    >>> message = '''
+    ... {"id": 1, 
+    ...   "type": "event", 
+    ...   "event": {
+    ...     "event_type": "state_changed", 
+    ...     "data": {"entity_id": "example_id", 
+    ...       "new_state": {"entity_id": "example_id", 
+    ...         "state": "on", "attributes": {"an_attribute": "new_value", "min_mireds": 153, "max_mireds": 500}},
+    ...       "old_state": {"entity_id": "example_id", 
+    ...         "state": "off", "attributes": {"an_attribute": "old_value", "min_mireds": 153, "max_mireds": 500}}
+    ...     }
+    ...   }
+    ... }
+    ... '''
+    >>> message_data = json.loads(message)
+    >>> message_trigger = Example(message_data)
+    >>> trigger == message_trigger
+    True
+    >>> message_description = Description(message_data)
+    >>> trigger.is_triggered(message_description)
+    True
+    >>> str(trigger)
+    'Triggered entity example_id with state changed in on'
+    """
+
+    def __eq__(self, other):
+        if super(ChangedState, self).__eq__(other):
+            if self.state == other.state:
+                return True
+        return False
+
+    def __hash__(self):
+        return hash(
+            "{}{}{}".format(super(ChangedState, self).__hash__(), self.entity_id, self.state)
+        )
+
+    def __str__(self, *args, **kwargs):
+        s = "Triggered entity {} with state changed in {}".format(
+            self.entity_id, self.state)
+        return s
+
+    def is_triggered(self, another_description):
+        if super(ChangedState, self).is_triggered(another_description):
+            other = self.__class__(another_description.message)
+            if self == other:
+                if other.state != other._old_state:
+                    return True
+
+
+class ChangedAttribute(Trigger):
+    """
+    >>> from home_assistant_plugin.message import Description
+    >>> class Example(ChangedAttribute):
+    ...     Message = {
+    ...         "type": "event",
+    ...         "event": {
+    ...         "event_type": "state_changed", 
+    ...             "data": {
+    ...                 "entity_id": "example_id",
+    ...                 "new_state": {"entity_id": "example_id", "attributes": {"an_attribute": "a_value"}},
+    ...             }
+    ...         }
+    ...     }
+    >>> trigger = Example.make("example_id")
+    >>> import json
+    >>> message = '''
+    ... {"id": 1, 
+    ...   "type": "event", 
+    ...   "event": {
+    ...     "event_type": "state_changed", 
+    ...     "data": {"entity_id": "example_id", 
+    ...       "new_state": {"entity_id": "example_id", 
+    ...         "state": "on", "attributes": {"an_attribute": "new_value", "min_mireds": 153, "max_mireds": 500}},
+    ...       "old_state": {"entity_id": "example_id", 
+    ...         "state": "off", "attributes": {"an_attribute": "old_value", "min_mireds": 153, "max_mireds": 500}}
+    ...     }
+    ...   }
+    ... }
+    ... '''
+    >>> message_data = json.loads(message)
+    >>> message_trigger = Example(message_data)
+    >>> trigger == message_trigger
+    True
+    >>> message_description = Description(message_data)
+    >>> trigger.is_triggered(message_description)
+    True
+    >>> len(set([trigger, message_trigger]))
+    2
+    >>> str(trigger)
+    "Triggered entity example_id with at least one changed attribute in ['an_attribute']"
+    """
+
+    def __eq__(self, other):
+        if super(ChangedAttribute, self).__eq__(other):
+            if set(self.attributes.keys()).issubset(set(other.attributes.keys())):
+                return True
+        return False
+
+    def __hash__(self):
+        attributes = ".".join([attribute for attribute in self.attributes.keys()])
+        return hash(
+            "{}{}{}{}".format(super(ChangedAttribute, self).__hash__(), self.entity_id, self.state, attributes)
+        )
+
+    def __str__(self, *args, **kwargs):
+        s = "Triggered entity {} with at least one changed attribute in {}".format(
+            self.entity_id, list(self.attributes.keys())
+        )
+        return s
+
+    def is_triggered(self, another_description):
+        if super(ChangedAttribute, self).is_triggered(another_description):
+            other = self.__class__(another_description.message)
+            if self == other:
+                for attribute in self.attributes.keys():
+                    if attribute in other._old_attributes:
+                        if other.attributes[attribute] != other._old_attributes[attribute]:
+                            return True
+
+
 class Comparison(Trigger):
     def __init__(self, message, events=None, value=None):
         message = self.override_value(message, value)
