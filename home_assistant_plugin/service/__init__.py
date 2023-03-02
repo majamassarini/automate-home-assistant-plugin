@@ -1,4 +1,5 @@
 from home_assistant_plugin.service import trigger
+from home_assistant_plugin.service import light
 from home_assistant_plugin.service import sensor
 from home_assistant_plugin.service import media_player
 from home_assistant_plugin.service import notify

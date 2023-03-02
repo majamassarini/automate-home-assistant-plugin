@@ -1,2 +1,2 @@
 git+git://github.com/majamassarini/automate-home.git
-aiohttp
+aiohttp==3.8.1

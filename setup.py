@@ -5,7 +5,7 @@ with open(path.join(".", 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name="automate-home-assistant-plugin",
-      version="0.9.1",
+      version="0.9.2",
       url="https://github.com/majamassarini/automate-home",
       description="An Home Assistant plugin for automate-home",
       long_description=long_description,

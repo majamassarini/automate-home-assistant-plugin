@@ -25,7 +25,6 @@ class Factory:
 
 
 class Playing(Equals):
-
     Message = {
         "type": "event",
         "event": {
@@ -45,7 +44,6 @@ class Playing(Equals):
 
 
 class Paused(Equals):
-
     Message = {
         "type": "event",
         "event": {

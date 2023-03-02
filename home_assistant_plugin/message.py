@@ -5,7 +5,6 @@ import home
 
 
 class Description(home.protocol.Description):
-
     PROTOCOL = "home_assistant"
 
     Message = {
@@ -58,13 +57,46 @@ class Description(home.protocol.Description):
 
 
 class Trigger(home.protocol.Trigger, Description):
+    """
+    >>> class Example(Trigger):
+    ...     Message = {
+    ...         "type": "event",
+    ...         "event": {
+    ...         "event_type": "state_changed", 
+    ...             "data": {
+    ...                 "entity_id": "example_id",
+    ...                 "new_state": {"entity_id": "example_id", "state": "on", "attributes": {"an_attribute": "a_value"}},
+    ...             }
+    ...         }
+    ...     }
+    >>> trigger = Example.make("example_id")
+    >>> import json
+    >>> message = '''
+    ... {"id": 1, 
+    ...   "type": "event", 
+    ...   "event": {
+    ...     "event_type": "state_changed", 
+    ...     "data": {"entity_id": "example_id", 
+    ...       "new_state": {"entity_id": "example_id", 
+    ...         "state": "on", "attributes": {"an_attribute": "a_value", "min_mireds": 153, "max_mireds": 500}},
+    ...       "old_state": {"entity_id": "example_id", 
+    ...         "state": "off", "attributes": {"an_attribute": "a_value", "min_mireds": 153, "max_mireds": 500}}
+    ...     }
+    ...   }
+    ... }
+    ... '''
+    >>> message_data = json.loads(message)
+    >>> message_trigger = Example(message_data)
+    >>> trigger == message_trigger
+    True
+    """
 
     Message = {
         "type": "event",
         "event": {
             "data": {
                 "entity_id": "some id",
-                "new_state": {"entity_id": "some id", "state": "???", "attributes": {}},
+                "new_state": {"entity_id": "some id", "state": "new_state", "attributes": {"an_attribute": "a_value"}},
             },
             "event_type": "state_changed",
         },
@@ -75,13 +107,26 @@ class Trigger(home.protocol.Trigger, Description):
         if message["type"] == self.Message["type"]:
             if message["event"]["event_type"] == self.Message["event"]["event_type"]:
                 self._entity_id = message["event"]["data"]["entity_id"]
-                self._state = message["event"]["data"]["new_state"]["state"]
+                try:
+                    self._state = message["event"]["data"]["new_state"]["state"]
+                except KeyError:
+                    self._state = None
+                try:
+                    self._old_state = message["event"]["data"]["old_state"]["state"]
+                except KeyError:
+                    self._old_state = None
                 try:
                     self._attributes = message["event"]["data"]["new_state"][
                         "attributes"
                     ]
                 except KeyError:
-                    pass
+                    self._attributes = {}
+                try:
+                    self._old_attributes = message["event"]["data"]["old_state"][
+                        "attributes"
+                    ]
+                except KeyError:
+                    self._old_attributes = {}
             else:
                 raise AttributeError(
                     "Given message ({}) is not a state_changed event message"
@@ -237,3 +282,54 @@ class Command(home.protocol.Command, Description):
             self.domain, self.service, self.entity_id
         )
         return s
+
+
+class LightCommand(Command):
+    """
+    >>> import json
+    >>> command_data = '''
+    ... {
+    ...   "type": "call_service",
+    ...   "domain": "light",
+    ...   "service": "turn_on",
+    ...   "service_data": {},
+    ...   "target": {
+    ...     "entity_id": "light.kitchen"
+    ...   }
+    ... }
+    ... '''
+    >>> command_data = json.loads(command_data)
+    >>> command = LightCommand(command_data)
+    >>> command.execute()
+    [Command: domain 'light', service 'turn_on', entity_id 'light.kitchen']
+    >>> command.message["target"]["entity_id"] == "light.kitchen"
+    True
+    """
+
+    Message = {
+        "type": "call_service",
+        "domain": "none",
+        "service": "none",
+        "service_data": {},
+        "target": {
+            "entity_id": "none",
+        },
+    }
+
+    def __init__(self, message):
+        super(Command, self).__init__(message)
+        if message["type"] == self.Message["type"]:
+            self._domain = message["domain"]
+            self._service = message["service"]
+            self._entity_id = message["target"]["entity_id"]
+        else:
+            raise AttributeError(
+                "Given message ({}) is not a command message"
+                'it should be of type "event"'.format(message)
+            )
+
+    @classmethod
+    def make(cls, entity_id):
+        message = copy.deepcopy(cls.Message)
+        message["target"]["entity_id"] = entity_id
+        return cls(message)
