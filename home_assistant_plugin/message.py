@@ -109,23 +109,23 @@ class Trigger(home.protocol.Trigger, Description):
                 self._entity_id = message["event"]["data"]["entity_id"]
                 try:
                     self._state = message["event"]["data"]["new_state"]["state"]
-                except KeyError:
+                except (TypeError, KeyError):
                     self._state = None
                 try:
                     self._old_state = message["event"]["data"]["old_state"]["state"]
-                except KeyError:
+                except (TypeError, KeyError):
                     self._old_state = None
                 try:
                     self._attributes = message["event"]["data"]["new_state"][
                         "attributes"
                     ]
-                except KeyError:
+                except (TypeError, KeyError):
                     self._attributes = {}
                 try:
                     self._old_attributes = message["event"]["data"]["old_state"][
                         "attributes"
                     ]
-                except KeyError:
+                except (TypeError, KeyError):
                     self._old_attributes = {}
             else:
                 raise AttributeError(
