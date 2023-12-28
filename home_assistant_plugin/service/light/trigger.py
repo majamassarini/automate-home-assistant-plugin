@@ -132,7 +132,7 @@ class Brightness(ChangedAttribute):
         new_state = super(Brightness, self).make_new_state_from(
             another_description, old_state
         )
-        new_state.brightness = another_description.message["event"]["data"]["new_state"]["attributes"]["brightness"]
+        new_state.brightness = int(another_description.message["event"]["data"]["new_state"]["attributes"]["brightness"] * (100 / 255))
         return new_state
 
 
@@ -165,7 +165,7 @@ class Temperature(ChangedAttribute):
         new_state = super(Temperature, self).make_new_state_from(
             another_description, old_state
         )
-        new_state.temperature = another_description.message["event"]["data"]["new_state"]["attributes"]["color_temp"]
+        new_state.temperature = another_description.message["event"]["data"]["new_state"]["attributes"]["color_temp"] * 10000
         return new_state
 
 
