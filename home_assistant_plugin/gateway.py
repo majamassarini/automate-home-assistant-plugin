@@ -85,14 +85,15 @@ class Gateway(home.protocol.Gateway):
                                             trigger
                                             and trigger.entity_id in self._triggers
                                         ):
-                                            self._loop.create_task(task(trigger))
+                                            self._loop.create_task(task(trigger),
+                                                                   name="Home assistant trigger received {}".format(str(trigger)))
                         elif msg.type == aiohttp.WSMsgType.ERROR:
                             self.logger.error(
                                 "received: {}".format(
                                     json.dumps(data, indent=4, sort_keys=True)
                                 )
                             )
-                asyncio.sleep(10)
+                await asyncio.sleep(0.1)
 
     async def disconnect(self):
         if self._session:
