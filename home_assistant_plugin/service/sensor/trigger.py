@@ -1,3 +1,5 @@
+from typing import Any, ClassVar
+
 from home_assistant_plugin.service.trigger import Equals
 
 
@@ -38,12 +40,16 @@ class FloatMixin:
 
 
 class On(Equals):
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "event",
         "event": {
             "data": {
                 "entity_id": "none",
-                "new_state": {"entity_id": "none", "state": "on", "attributes": {}},
+                "new_state": {
+                    "entity_id": "none",
+                    "state": "on",
+                    "attributes": {},
+                },
             },
             "event_type": "state_changed",
         },
@@ -51,12 +57,16 @@ class On(Equals):
 
 
 class Off(Equals):
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "event",
         "event": {
             "data": {
                 "entity_id": "none",
-                "new_state": {"entity_id": "none", "state": "off", "attributes": {}},
+                "new_state": {
+                    "entity_id": "none",
+                    "state": "off",
+                    "attributes": {},
+                },
             },
             "event_type": "state_changed",
         },

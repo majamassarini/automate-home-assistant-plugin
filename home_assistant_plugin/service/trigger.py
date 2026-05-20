@@ -147,7 +147,9 @@ class Equals(Trigger):
 
     def __hash__(self):
         return hash(
-            "{}{}{}".format(super(Equals, self).__hash__(), self.entity_id, self.state)
+            "{}{}{}".format(
+                super(Equals, self).__hash__(), self.entity_id, self.state
+            )
         )
 
     def __str__(self, *args, **kwargs):
@@ -162,7 +164,11 @@ class Equals(Trigger):
             if self.state == other.state and set(
                 [key for key in self.attributes.keys()]
             ) == set(
-                [key for key in other.attributes.keys() if key in self.attributes]
+                [
+                    key
+                    for key in other.attributes.keys()
+                    if key in self.attributes
+                ]
             ):
                 self._logger.info("triggered {}".format(another_description))
                 return True
@@ -176,7 +182,7 @@ class ChangedState(Trigger):
     ...     Message = {
     ...         "type": "event",
     ...         "event": {
-    ...         "event_type": "state_changed", 
+    ...         "event_type": "state_changed",
     ...             "data": {
     ...                 "entity_id": "example_id",
     ...                 "new_state": {"entity_id": "example_id", "state": "on"},
@@ -186,14 +192,14 @@ class ChangedState(Trigger):
     >>> trigger = Example.make("example_id")
     >>> import json
     >>> message = '''
-    ... {"id": 1, 
-    ...   "type": "event", 
+    ... {"id": 1,
+    ...   "type": "event",
     ...   "event": {
-    ...     "event_type": "state_changed", 
-    ...     "data": {"entity_id": "example_id", 
-    ...       "new_state": {"entity_id": "example_id", 
+    ...     "event_type": "state_changed",
+    ...     "data": {"entity_id": "example_id",
+    ...       "new_state": {"entity_id": "example_id",
     ...         "state": "on", "attributes": {"an_attribute": "new_value", "min_mireds": 153, "max_mireds": 500}},
-    ...       "old_state": {"entity_id": "example_id", 
+    ...       "old_state": {"entity_id": "example_id",
     ...         "state": "off", "attributes": {"an_attribute": "old_value", "min_mireds": 153, "max_mireds": 500}}
     ...     }
     ...   }
@@ -218,12 +224,17 @@ class ChangedState(Trigger):
 
     def __hash__(self):
         return hash(
-            "{}{}{}".format(super(ChangedState, self).__hash__(), self.entity_id, self.state)
+            "{}{}{}".format(
+                super(ChangedState, self).__hash__(),
+                self.entity_id,
+                self.state,
+            )
         )
 
     def __str__(self, *args, **kwargs):
         s = "Triggered entity {} with state changed in {}".format(
-            self.entity_id, self.state)
+            self.entity_id, self.state
+        )
         return s
 
     def is_triggered(self, another_description):
@@ -241,7 +252,7 @@ class ChangedAttribute(Trigger):
     ...     Message = {
     ...         "type": "event",
     ...         "event": {
-    ...         "event_type": "state_changed", 
+    ...         "event_type": "state_changed",
     ...             "data": {
     ...                 "entity_id": "example_id",
     ...                 "new_state": {"entity_id": "example_id", "attributes": {"an_attribute": "a_value"}},
@@ -251,14 +262,14 @@ class ChangedAttribute(Trigger):
     >>> trigger = Example.make("example_id")
     >>> import json
     >>> message = '''
-    ... {"id": 1, 
-    ...   "type": "event", 
+    ... {"id": 1,
+    ...   "type": "event",
     ...   "event": {
-    ...     "event_type": "state_changed", 
-    ...     "data": {"entity_id": "example_id", 
-    ...       "new_state": {"entity_id": "example_id", 
+    ...     "event_type": "state_changed",
+    ...     "data": {"entity_id": "example_id",
+    ...       "new_state": {"entity_id": "example_id",
     ...         "state": "on", "attributes": {"an_attribute": "new_value", "min_mireds": 153, "max_mireds": 500}},
-    ...       "old_state": {"entity_id": "example_id", 
+    ...       "old_state": {"entity_id": "example_id",
     ...         "state": "off", "attributes": {"an_attribute": "old_value", "min_mireds": 153, "max_mireds": 500}}
     ...     }
     ...   }
@@ -279,14 +290,23 @@ class ChangedAttribute(Trigger):
 
     def __eq__(self, other):
         if super(ChangedAttribute, self).__eq__(other):
-            if set(self.attributes.keys()).issubset(set(other.attributes.keys())):
+            if set(self.attributes.keys()).issubset(
+                set(other.attributes.keys())
+            ):
                 return True
         return False
 
     def __hash__(self):
-        attributes = ".".join([attribute for attribute in self.attributes.keys()])
+        attributes = ".".join(
+            [attribute for attribute in self.attributes.keys()]
+        )
         return hash(
-            "{}{}{}{}".format(super(ChangedAttribute, self).__hash__(), self.entity_id, self.state, attributes)
+            "{}{}{}{}".format(
+                super(ChangedAttribute, self).__hash__(),
+                self.entity_id,
+                self.state,
+                attributes,
+            )
         )
 
     def __str__(self, *args, **kwargs):
@@ -301,7 +321,10 @@ class ChangedAttribute(Trigger):
             if self == other:
                 for attribute in self.attributes.keys():
                     if attribute in other._old_attributes:
-                        if other.attributes[attribute] != other._old_attributes[attribute]:
+                        if (
+                            other.attributes[attribute]
+                            != other._old_attributes[attribute]
+                        ):
                             return True
 
 
@@ -389,7 +412,9 @@ class InBetween(Comparison):
     def is_triggered(self, another_description):
         if super(InBetween, self).is_triggered(another_description):
             triggered = (
-                self.state < another_description.state < (self.state + self._range)
+                self.state
+                < another_description.state
+                < (self.state + self._range)
             )
             self._logger.debug(
                 "{} triggered={} {} < {} < {}".format(
@@ -405,4 +430,6 @@ class InBetween(Comparison):
 
     def __str__(self):
         s = super(InBetween, self).__str__()
-        return "{} in between [{}:{}]".format(s, self.state, (self.state + self._range))
+        return "{} in between [{}:{}]".format(
+            s, self.state, (self.state + self._range)
+        )

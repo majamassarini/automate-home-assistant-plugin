@@ -1,3 +1,4 @@
+from typing import Any, ClassVar
 import home
 from home_assistant_plugin.service.trigger import Equals
 
@@ -25,7 +26,7 @@ class Factory:
 
 
 class Playing(Equals):
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "event",
         "event": {
             "data": {
@@ -44,12 +45,16 @@ class Playing(Equals):
 
 
 class Paused(Equals):
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "event",
         "event": {
             "data": {
                 "entity_id": "none",
-                "new_state": {"entity_id": "none", "state": "paused", "attributes": {}},
+                "new_state": {
+                    "entity_id": "none",
+                    "state": "paused",
+                    "attributes": {},
+                },
             },
             "event_type": "state_changed",
         },

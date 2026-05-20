@@ -1,5 +1,5 @@
 import home
-from typing import Union
+from typing import Union, ClassVar, Any
 from home_assistant_plugin.message import LightCommand as Parent
 
 
@@ -18,7 +18,7 @@ class TurnOn(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -60,7 +60,7 @@ class TurnOff(Parent):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -105,7 +105,7 @@ class Brightness(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -114,7 +114,7 @@ class Brightness(Parent):
         },
         "target": {
             "entity_id": "none",
-        }
+        },
     }
 
     def make_msgs_from(
@@ -154,7 +154,7 @@ class OffBrightness(Parent):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -206,7 +206,7 @@ class Temperature(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -260,7 +260,7 @@ class OffTemperature(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -314,7 +314,7 @@ class HueSaturation(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -370,7 +370,7 @@ class OffHueSaturation(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
