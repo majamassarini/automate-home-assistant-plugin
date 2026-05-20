@@ -1,3 +1,4 @@
+from typing import Any, ClassVar
 import copy
 
 import home
@@ -23,11 +24,16 @@ class Command(Description, home.protocol.Command):
     [Command: domain 'notify', service 'notify', message 'socket has been detached', title '', target [], other data {}]
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "none",
         "service": "none",
-        "service_data": {"message": "none", "title": "none", "target": [], "data": {}},
+        "service_data": {
+            "message": "none",
+            "title": "none",
+            "target": [],
+            "data": {},
+        },
     }
 
     def __init__(self, message):
@@ -100,16 +106,18 @@ class Command(Description, home.protocol.Command):
         return []
 
     @classmethod
-    def make(cls, message: str, title: str, target: list, data: dict) -> "Command":
+    def make(  # type: ignore[override]
+        cls, message: str, title: str, target: list, data: dict
+    ) -> "Command":
         msg = copy.deepcopy(cls.Message)
-        msg["service_data"]["message"] = message
-        msg["service_data"]["title"] = title
-        msg["service_data"]["target"] = target
-        msg["service_data"]["data"] = data
+        msg["service_data"]["message"] = message  # type: ignore[index]
+        msg["service_data"]["title"] = title  # type: ignore[index]
+        msg["service_data"]["target"] = target  # type: ignore[index]
+        msg["service_data"]["data"] = data  # type: ignore[index]
         return cls(msg)
 
     @classmethod
-    def make_from_yaml(
+    def make_from_yaml(  # type: ignore[override]
         cls, message: str, title: str, target: list, data: dict
     ) -> "Command":
         return cls.make(message, title, target, data)
@@ -138,7 +146,7 @@ class Detachable(Command):
     [Command: domain 'notify', service 'notify', message 'some socket is now detachable', title '', target [], other data {}]
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "notify",
         "service": "notify",

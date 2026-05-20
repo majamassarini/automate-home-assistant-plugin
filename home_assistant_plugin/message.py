@@ -1,5 +1,6 @@
 import copy
 import logging
+from typing import Any, ClassVar
 
 import home
 
@@ -7,7 +8,7 @@ import home
 class Description(home.protocol.Description):
     PROTOCOL = "home_assistant"
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "none",
     }
 
@@ -62,7 +63,7 @@ class Trigger(home.protocol.Trigger, Description):
     ...     Message = {
     ...         "type": "event",
     ...         "event": {
-    ...         "event_type": "state_changed", 
+    ...         "event_type": "state_changed",
     ...             "data": {
     ...                 "entity_id": "example_id",
     ...                 "new_state": {"entity_id": "example_id", "state": "on", "attributes": {"an_attribute": "a_value"}},
@@ -72,14 +73,14 @@ class Trigger(home.protocol.Trigger, Description):
     >>> trigger = Example.make("example_id")
     >>> import json
     >>> message = '''
-    ... {"id": 1, 
-    ...   "type": "event", 
+    ... {"id": 1,
+    ...   "type": "event",
     ...   "event": {
-    ...     "event_type": "state_changed", 
-    ...     "data": {"entity_id": "example_id", 
-    ...       "new_state": {"entity_id": "example_id", 
+    ...     "event_type": "state_changed",
+    ...     "data": {"entity_id": "example_id",
+    ...       "new_state": {"entity_id": "example_id",
     ...         "state": "on", "attributes": {"an_attribute": "a_value", "min_mireds": 153, "max_mireds": 500}},
-    ...       "old_state": {"entity_id": "example_id", 
+    ...       "old_state": {"entity_id": "example_id",
     ...         "state": "off", "attributes": {"an_attribute": "a_value", "min_mireds": 153, "max_mireds": 500}}
     ...     }
     ...   }
@@ -91,12 +92,16 @@ class Trigger(home.protocol.Trigger, Description):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "event",
         "event": {
             "data": {
                 "entity_id": "some id",
-                "new_state": {"entity_id": "some id", "state": "new_state", "attributes": {"an_attribute": "a_value"}},
+                "new_state": {
+                    "entity_id": "some id",
+                    "state": "new_state",
+                    "attributes": {"an_attribute": "a_value"},
+                },
             },
             "event_type": "state_changed",
         },
@@ -105,14 +110,21 @@ class Trigger(home.protocol.Trigger, Description):
     def __init__(self, message, events=None):
         super(Trigger, self).__init__(message, events)
         if message["type"] == self.Message["type"]:
-            if message["event"]["event_type"] == self.Message["event"]["event_type"]:
+            if (
+                message["event"]["event_type"]
+                == self.Message["event"]["event_type"]
+            ):
                 self._entity_id = message["event"]["data"]["entity_id"]
                 try:
-                    self._state = message["event"]["data"]["new_state"]["state"]
+                    self._state = message["event"]["data"]["new_state"][
+                        "state"
+                    ]
                 except (TypeError, KeyError):
                     self._state = None
                 try:
-                    self._old_state = message["event"]["data"]["old_state"]["state"]
+                    self._old_state = message["event"]["data"]["old_state"][
+                        "state"
+                    ]
                 except (TypeError, KeyError):
                     self._old_state = None
                 try:
@@ -122,9 +134,9 @@ class Trigger(home.protocol.Trigger, Description):
                 except (TypeError, KeyError):
                     self._attributes = {}
                 try:
-                    self._old_attributes = message["event"]["data"]["old_state"][
-                        "attributes"
-                    ]
+                    self._old_attributes = message["event"]["data"][
+                        "old_state"
+                    ]["attributes"]
                 except (TypeError, KeyError):
                     self._old_attributes = {}
             else:
@@ -158,7 +170,9 @@ class Trigger(home.protocol.Trigger, Description):
         return False
 
     def __hash__(self):
-        return hash("{}{}".format(super(Trigger, self).__hash__(), self.entity_id))
+        return hash(
+            "{}{}".format(super(Trigger, self).__hash__(), self.entity_id)
+        )
 
     def is_triggered(self, another_description):
         if super(Trigger, self).is_triggered(another_description):
@@ -211,7 +225,7 @@ class Command(home.protocol.Command, Description):
     [Command: domain 'light', service 'turn_on', entity_id 'light.kitchen']
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "none",
         "service": "none",
@@ -306,7 +320,7 @@ class LightCommand(Command):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "none",
         "service": "none",

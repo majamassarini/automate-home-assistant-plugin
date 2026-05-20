@@ -1,3 +1,5 @@
+from typing import Union, ClassVar, Any
+
 import home
 from home_assistant_plugin.message import Command as Parent
 
@@ -15,7 +17,7 @@ class Play(Parent):
     'media_play'
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "media_player",
         "service": "media_play",
@@ -24,11 +26,11 @@ class Play(Parent):
 
     def make_msgs_from(
         self,
-        old_state: [
+        old_state: Union[
             home.appliance.attribute.mixin.IsOn,
             home.appliance.attribute.mixin.IsOff,
         ],
-        new_state: [
+        new_state: Union[
             home.appliance.attribute.mixin.IsOn,
             home.appliance.attribute.mixin.IsOff,
         ],
@@ -52,7 +54,7 @@ class Pause(Parent):
     'media_pause'
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "media_player",
         "service": "media_pause",
@@ -61,11 +63,11 @@ class Pause(Parent):
 
     def make_msgs_from(
         self,
-        old_state: [
+        old_state: Union[
             home.appliance.attribute.mixin.IsOn,
             home.appliance.attribute.mixin.IsOff,
         ],
-        new_state: [
+        new_state: Union[
             home.appliance.attribute.mixin.IsOn,
             home.appliance.attribute.mixin.IsOff,
         ],
@@ -91,7 +93,7 @@ class VolumeSet(Parent):
     15
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "media_player",
         "service": "volume_set",
@@ -125,7 +127,7 @@ class ShuffleSet(Parent):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "media_player",
         "service": "shuffle_set",
@@ -154,7 +156,7 @@ class SelectSource(Parent):
     'morning playlist'
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "media_player",
         "service": "select_source",

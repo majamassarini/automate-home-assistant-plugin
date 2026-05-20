@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automate-home-assistant-plugin"
+version = "0.9.2"
+description = "A Home Assistant plugin for automate-home"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Maja Massarini", email = "maja.massarini@gmail.com" }]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Communications",
+    "Intended Audience :: Developers",
+]
+dependencies = ["automate-home", "aiohttp"]
+
+[project.urls]
+Homepage = "https://github.com/majamassarini/automate-home-assistant-plugin"
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "flake8-pyproject",
+    "black",
+    "mypy",
+    "coverage",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["home_assistant_plugin*"]
+
+[tool.coverage.run]
+command_line = "-m unittest discover"
+omit = ["*tests*", "*__init__.py"]
+
+[tool.coverage.report]
+omit = ["*tests*", "*__init__.py"]
+
+[tool.mypy]
+no_strict_optional = true
+exclude = ["home_assistant_plugin/tests/", "^docs/"]
+disable_error_code = ["import-untyped"]
+
+[[tool.mypy.overrides]]
+module = ["home", "home.*", "aiohttp", "aiohttp.*"]
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 79
+target-version = ["py312", "py313"]
+
+[tool.flake8]
+max-line-length = 79
+max-doc-length = 120
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+    "*.egg-info",
+]
+extend-ignore = [
+    "E203",
+    "W503",
+    "E501",
+    "W505",
+    "F821",
+]
+per-file-ignores = [
+    "*/__init__.py:F401,E402",
+]
