@@ -116,10 +116,11 @@ class Gateway(home.protocol.Gateway):
                                     )
                                 )
                 except Exception as e:
-                    self._websocket = None
                     self.logger.warning(
                         "HA connection failed: %s — retrying in 60 s", e
                     )
+                finally:
+                    self._websocket = None
                 await asyncio.sleep(60)
 
     async def disconnect(self):
@@ -127,7 +128,7 @@ class Gateway(home.protocol.Gateway):
             await self._session.close()
 
     async def writer(self, msgs, *args):
-        if not self._websocket:
+        if not self._websocket or self._websocket.closed:
             self.logger.warning(
                 "HA writer: not connected, skipping %d msg(s)", len(msgs)
             )

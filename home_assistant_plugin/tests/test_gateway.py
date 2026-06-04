@@ -120,6 +120,7 @@ class TestGatewayWriter(unittest.IsolatedAsyncioTestCase):
 
     async def test_writer_sends_command_message(self):
         mock_ws = AsyncMock()
+        mock_ws.closed = False
         self.gw._websocket = mock_ws
         cmd = MagicMock(spec=Command)
         cmd.message = {"type": "call_service", "domain": "light"}
@@ -133,6 +134,7 @@ class TestGatewayWriter(unittest.IsolatedAsyncioTestCase):
 
     async def test_writer_sends_notifier_message(self):
         mock_ws = AsyncMock()
+        mock_ws.closed = False
         self.gw._websocket = mock_ws
         notif = MagicMock(spec=Notifier)
         notif.message = {"type": "call_service", "domain": "notify"}
@@ -143,6 +145,7 @@ class TestGatewayWriter(unittest.IsolatedAsyncioTestCase):
 
     async def test_writer_increments_id_per_message(self):
         mock_ws = AsyncMock()
+        mock_ws.closed = False
         self.gw._websocket = mock_ws
 
         for _ in range(3):
@@ -156,6 +159,21 @@ class TestGatewayWriter(unittest.IsolatedAsyncioTestCase):
         mock_ws = AsyncMock()
         self.gw._websocket = mock_ws
         await self.gw.writer([])
+        mock_ws.send_str.assert_not_called()
+
+    async def test_writer_skips_when_websocket_is_closed(self):
+        """Regression: writer must not attempt send_str on a closed websocket.
+
+        When HA closes the connection gracefully, the aiohttp websocket object
+        remains non-None but .closed becomes True.  Before the fix writer()
+        would call send_str() and raise 'Cannot write to closing transport'.
+        """
+        mock_ws = MagicMock()
+        mock_ws.closed = True
+        self.gw._websocket = mock_ws
+        cmd = MagicMock(spec=Command)
+        cmd.message = {"type": "call_service"}
+        await self.gw.writer([cmd])
         mock_ws.send_str.assert_not_called()
 
 
@@ -386,6 +404,26 @@ class TestGatewayRunReconnect(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.gw._websocket)
         self.assertTrue(any("retrying" in line for line in cm.output))
         self.assertEqual(sleep_calls[0], 60)
+
+    async def test_run_resets_websocket_after_normal_close(self):
+        """Regression: _websocket must be reset to None when HA closes the
+        WebSocket gracefully (no exception).
+
+        Before the fix the finally block was missing; _websocket kept pointing
+        to the closed socket, so the next writer() call would raise
+        'Cannot write to closing transport'.
+        """
+        mock_ws = _MockWebSocket([])  # empty message list — loop exits cleanly
+        with _patch_session(mock_ws):
+            with patch(
+                "home_assistant_plugin.gateway.asyncio.sleep",
+                side_effect=asyncio.CancelledError,
+            ):
+                try:
+                    await self.gw.run([])
+                except asyncio.CancelledError:
+                    pass
+        self.assertIsNone(self.gw._websocket)
 
     async def test_writer_does_not_block_after_connection_failure(self):
         """After a failed connection, writer() must return instantly (not hang)
