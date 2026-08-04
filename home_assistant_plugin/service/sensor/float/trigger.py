@@ -1,5 +1,5 @@
 import home
-from home_assistant_plugin.message import Trigger
+from home_assistant_plugin.message import Description, Trigger
 from home_assistant_plugin.service.sensor.trigger import FloatMixin
 from home_assistant_plugin.service.trigger import (
     GreaterThan as GTParent,
@@ -9,9 +9,7 @@ from home_assistant_plugin.service.trigger import (
 
 
 class Always(FloatMixin, Trigger, home.protocol.mean.Mixin):
-    def get_value(
-        self, description: "home_assistant_plugin.message.Description"
-    ) -> float:
+    def get_value(self, description: Description) -> float:
         return float(description.state)
 
 

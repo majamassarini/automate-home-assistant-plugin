@@ -1,5 +1,5 @@
 import home
-from typing import Union
+from typing import Union, ClassVar, Any
 from home_assistant_plugin.message import LightCommand as Parent
 
 
@@ -18,7 +18,7 @@ class TurnOn(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -60,7 +60,7 @@ class TurnOff(Parent):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -105,7 +105,7 @@ class Brightness(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -114,7 +114,7 @@ class Brightness(Parent):
         },
         "target": {
             "entity_id": "none",
-        }
+        },
     }
 
     def make_msgs_from(
@@ -145,7 +145,8 @@ class OffBrightness(Parent):
     >>> import home_assistant_plugin
 
     >>> off_state = home.appliance.light.indoor.dimmerable.state.off.State()
-    >>> brightness_state = off_state.next(home.appliance.light.event.brightness.Event(51))
+    >>> on_state = off_state.next(home.appliance.light.indoor.dimmerable.event.forced.Event.On)
+    >>> brightness_state = on_state.next(home.appliance.light.event.brightness.Event(51))
     >>> cmd = home_assistant_plugin.service.light.command.OffBrightness.make("a light")
     >>> msg = cmd.make_msgs_from(off_state, brightness_state)
     >>> len(msg) and msg[0].service == 'turn_off'
@@ -154,7 +155,7 @@ class OffBrightness(Parent):
     True
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -206,7 +207,7 @@ class Temperature(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -246,8 +247,8 @@ class OffTemperature(Parent):
     >>> import home_assistant_plugin
 
     >>> off_state = home.appliance.light.indoor.hue.state.off.State()
-    >>> new_temperature_state = off_state.next(home.appliance.light.event.temperature.Event(3200))
     >>> on_state = off_state.next(home.appliance.light.indoor.dimmerable.event.forced.Event.On)
+    >>> new_temperature_state = on_state.next(home.appliance.light.event.temperature.Event(3200))
     >>> cmd = home_assistant_plugin.service.light.command.OffTemperature.make("a light")
     >>> msg = cmd.make_msgs_from(on_state, new_temperature_state)
     >>> len(msg) and msg[0].service == 'turn_off'
@@ -256,11 +257,11 @@ class OffTemperature(Parent):
     'ColorMode.COLOR_TEMP'
     >>> msg[0].message["service_data"]["color_temp"]
     3
-    >>> cmd.make_msgs_from(off_state, on_state)
+    >>> cmd.make_msgs_from(on_state, off_state)
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -314,7 +315,7 @@ class HueSaturation(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_on",
@@ -356,7 +357,7 @@ class OffHueSaturation(Parent):
 
     >>> off_state = home.appliance.light.indoor.hue.state.off.State()
     >>> on_state = off_state.next(home.appliance.light.indoor.dimmerable.event.forced.Event.On)
-    >>> new_hue_state = off_state.next(home.appliance.light.event.hue.Event(320))
+    >>> new_hue_state = on_state.next(home.appliance.light.event.hue.Event(320))
     >>> new_saturation_state = new_hue_state.next(home.appliance.light.event.saturation.Event(80))
     >>> cmd = home_assistant_plugin.service.light.command.OffHueSaturation.make("a light")
     >>> msg = cmd.make_msgs_from(on_state, new_saturation_state)
@@ -370,7 +371,7 @@ class OffHueSaturation(Parent):
     []
     """
 
-    Message = {
+    Message: ClassVar[dict[str, Any]] = {
         "type": "call_service",
         "domain": "light",
         "service": "turn_off",
@@ -401,5 +402,58 @@ class OffHueSaturation(Parent):
                 new_state.hue,
                 new_state.saturation,
             )
+            result = self.execute()
+        return result
+
+
+class Effect(Parent):
+    """Send a native Philips Hue effect when the appliance enters show state.
+
+    >>> import home
+    >>> import home_assistant_plugin
+
+    >>> off_state = home.appliance.light.indoor.hue.state.off.State()
+    >>> show_state = off_state.next(home.appliance.light.indoor.dimmerable.event.forced.Event.Show)
+    >>> cmd = home_assistant_plugin.service.light.command.Effect.make("a light")
+    >>> msg = cmd.make_msgs_from(off_state, show_state)
+    >>> len(msg) and msg[0].service == 'turn_on'
+    True
+    >>> msg[0].message["service_data"]["effect"]
+    'prism'
+    >>> cmd.make_msgs_from(show_state, off_state)
+    []
+    >>> cmd_sparkle = home_assistant_plugin.service.light.command.Effect.make("a light", effect="sparkle")
+    >>> msg = cmd_sparkle.make_msgs_from(off_state, show_state)
+    >>> msg[0].message["service_data"]["effect"]
+    'sparkle'
+    """
+
+    Message: ClassVar[dict[str, Any]] = {
+        "type": "call_service",
+        "domain": "light",
+        "service": "turn_on",
+        "service_data": {"effect": "prism"},
+        "target": {
+            "entity_id": "none",
+        },
+    }
+
+    @classmethod
+    def make(cls, entity_id, effect="prism"):
+        cmd = super().make(entity_id)
+        cmd.message["service_data"]["effect"] = effect
+        return cmd
+
+    @classmethod
+    def make_from_yaml(cls, entity_id, effect="prism"):
+        return cls.make(entity_id, effect)
+
+    def make_msgs_from(
+        self,
+        old_state: Union[home.appliance.attribute.mixin.IsShowing,],
+        new_state: Union[home.appliance.attribute.mixin.IsShowing,],
+    ):
+        result = []
+        if new_state.is_showing:
             result = self.execute()
         return result

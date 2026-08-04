@@ -13,7 +13,9 @@ class Factory:
         """
         self._setup_triggers = setup_triggers
         self._factories = list()
-        self._factories.append(service.media_player.trigger.Factory(setup_triggers))
+        self._factories.append(
+            service.media_player.trigger.Factory(setup_triggers)
+        )
         self._factories.append(service.sensor.trigger.Factory(setup_triggers))
         self._factories.append(service.light.trigger.Factory(setup_triggers))
 
