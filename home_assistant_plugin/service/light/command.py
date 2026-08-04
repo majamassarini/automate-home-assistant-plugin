@@ -450,12 +450,8 @@ class Effect(Parent):
 
     def make_msgs_from(
         self,
-        old_state: Union[
-            home.appliance.attribute.mixin.IsShowing,
-        ],
-        new_state: Union[
-            home.appliance.attribute.mixin.IsShowing,
-        ],
+        old_state: Union[home.appliance.attribute.mixin.IsShowing,],
+        new_state: Union[home.appliance.attribute.mixin.IsShowing,],
     ):
         result = []
         if new_state.is_showing:
