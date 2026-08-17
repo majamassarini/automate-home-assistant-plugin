@@ -85,7 +85,7 @@ class VolumeSet(Parent):
 
     >>> cmd = home_assistant_plugin.service.media_player.command.VolumeSet.make(["bath_player"])
     >>> old_state = home.appliance.sound.player.state.forced.on.State()
-    >>> new_state = old_state.next(home.appliance.sound.player.event.sleepy_volume.Event(15))
+    >>> new_state = old_state.next(home.appliance.sound.player.event.volume.Event(15))
     >>> msg = cmd.make_msgs_from(old_state, new_state)
     >>> msg[0].service
     'volume_set'
