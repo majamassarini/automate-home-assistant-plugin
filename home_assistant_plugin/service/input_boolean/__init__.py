@@ -1,0 +1,1 @@
+from home_assistant_plugin.service.input_boolean import trigger
