@@ -1,6 +1,6 @@
 # automate-home-assistant-plugin
-[![Build Status](https://app.travis-ci.com/majamassarini/automate-home-assistant-plugin.svg?branch=main)](https://app.travis-ci.com/majamassarini/automate-home-assistant-plugin)
-[![codecov](https://codecov.io/gh/majamassarini/automate-home-assistant-plugin/branch/main/graph/badge.svg?token=)](https://codecov.io/gh/majamassarini/automate-home-assistant-plugin)
+[![Unit Tests](https://github.com/majamassarini/automate-home-assistant-plugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/majamassarini/automate-home-assistant-plugin/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/majamassarini/automate-home-assistant-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/majamassarini/automate-home-assistant-plugin)
 
 The **Home Assistant** plugin for the [automate-home project](https://github.com/majamassarini/automate-home).
 
