@@ -3,3 +3,9 @@ from home_assistant_plugin.service import light
 from home_assistant_plugin.service import sensor
 from home_assistant_plugin.service import media_player
 from home_assistant_plugin.service import notify
+from home_assistant_plugin.service import switch
+from home_assistant_plugin.service import binary_sensor
+from home_assistant_plugin.service import cover
+from home_assistant_plugin.service import climate
+from home_assistant_plugin.service import input_boolean
+from home_assistant_plugin.service import input_button
