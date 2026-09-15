@@ -1,0 +1,1 @@
+from home_assistant_plugin.service.binary_sensor import trigger

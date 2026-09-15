@@ -18,6 +18,12 @@ class Factory:
         )
         self._factories.append(service.sensor.trigger.Factory(setup_triggers))
         self._factories.append(service.light.trigger.Factory(setup_triggers))
+        self._factories.append(service.switch.trigger.Factory(setup_triggers))
+        self._factories.append(service.cover.trigger.Factory(setup_triggers))
+        self._factories.append(service.climate.trigger.Factory(setup_triggers))
+        self._factories.append(
+            service.input_button.trigger.Factory(setup_triggers)
+        )
 
     def get_triggers_from(self, message):
         triggers = list()
